@@ -1,574 +1,514 @@
+import { useState } from "react";
 import {
   ArrowRight,
   Check,
-  ChevronDown,
+  Heart,
   Instagram,
+  Leaf,
+  Menu,
   MessageCircle,
   ShieldCheck,
   Sparkles,
-  Heart,
-  Leaf,
-  Menu,
   X,
 } from "lucide-react";
 
-import { useState } from "react";
+const WHATSAPP =
+  "https://wa.me/918595119741?text=Hi%20Bebe%20Da%20Achaar!%20%F0%9F%8C%B6%20I%20would%20like%20to%20order%20some%20homemade%20achaar.";
 
-const WHATSAPP_NUMBER = "918595119741";
+function BebeLogo({ small = false }) {
+  return (
+    <div className={`brand-logo ${small ? "small" : ""}`}>
+      <div className="bebe-avatar">👵🏻</div>
+      <div className="brand-name">
+        <strong>Bebe Da</strong>
+        <strong>Achaar</strong>
+      </div>
+    </div>
+  );
+}
 
-const whatsappMessage = encodeURIComponent(
-  "Hi Bebe Da Achaar! ❤️ I would like to order some homemade achaar."
-);
+function AcharJar({ large = false }) {
+  return (
+    <div className={`jar-scene ${large ? "large" : ""}`}>
+      <div className="leaf leaf-a">🌿</div>
+      <div className="leaf leaf-b">🌿</div>
 
-const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
+      <div className="mango mango-one">🥭</div>
+      <div className="mango mango-two">🥭</div>
+
+      <div className="jar-shadow" />
+
+      <div className="achar-jar">
+        <div className="jar-lid">
+          <span />
+        </div>
+
+        <div className="jar-glass">
+          <div className="pickle-layer one" />
+          <div className="pickle-layer two" />
+          <div className="pickle-layer three" />
+
+          <div className="jar-label">
+            <div className="label-bebe">👵🏻</div>
+            <strong>Bebe Da</strong>
+            <strong>Achaar</strong>
+            <small>Homemade • Since forever</small>
+          </div>
+        </div>
+      </div>
+
+      <div className="spice-bowl">🌶️</div>
+      <div className="mustard-seeds">•••</div>
+    </div>
+  );
+}
+
+function ThaliVisual() {
+  return (
+    <div className="thali-visual">
+      <div className="wood-background" />
+
+      <div className="thali">
+        <div className="roti">🫓</div>
+        <div className="dal">🥣</div>
+        <div className="sabzi">🥗</div>
+        <div className="rice">🍚</div>
+
+        <div className="missing-achaar">
+          <span>ACHAR?</span>
+          <small>Missing piece!</small>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menu, setMenu] = useState(false);
 
-  const closeMenu = () => setMenuOpen(false);
+  const close = () => setMenu(false);
 
   return (
-    <div className="site">
+    <div className="app">
 
-      {/* ================= NAVBAR ================= */}
+      {/* NAVBAR */}
 
       <header className="navbar">
-        <a href="#home" className="nav-logo" onClick={closeMenu}>
-          <img src="/logo.png" alt="Bebe Da Achaar" />
+        <a href="#home" onClick={close}>
+          <BebeLogo small />
         </a>
 
-        <button
-          className="menu-button"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X size={23} /> : <Menu size={23} />}
-        </button>
-
-        <nav className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-          <a href="#home" onClick={closeMenu}>Home</a>
-          <a href="#featured" onClick={closeMenu}>Our Achaar</a>
-          <a href="#story" onClick={closeMenu}>Bebe Ki Kahani</a>
-          <a href="#why" onClick={closeMenu}>Why Bebe</a>
-          <a href="#contact" onClick={closeMenu}>Contact</a>
+        <nav className={menu ? "nav-menu open" : "nav-menu"}>
+          <a href="#home" onClick={close}>Home</a>
+          <a href="#achaar" onClick={close}>Our Achaar</a>
+          <a href="#story" onClick={close}>Bebe Ki Kahani</a>
+          <a href="#why" onClick={close}>Why Bebe</a>
+          <a href="#contact" onClick={close}>Contact</a>
 
           <a
-            href={whatsappUrl}
+            className="nav-order"
+            href={WHATSAPP}
             target="_blank"
             rel="noreferrer"
-            className="menu-order"
-            onClick={closeMenu}
+            onClick={close}
           >
+            <MessageCircle size={16} />
             Order on WhatsApp
-            <ArrowRight size={17} />
           </a>
         </nav>
+
+        <button
+          className="menu-toggle"
+          onClick={() => setMenu(!menu)}
+          aria-label="Menu"
+        >
+          {menu ? <X size={21} /> : <Menu size={21} />}
+        </button>
       </header>
 
 
-      {/* ================= HERO ================= */}
+      {/* HERO */}
 
-      <main>
+      <section className="hero" id="home">
 
-        <section className="hero" id="home">
+        <div className="hero-pattern pattern-one">🌿</div>
+        <div className="hero-pattern pattern-two">✦</div>
 
-          <div className="leaf-pattern leaf-one">✦</div>
-          <div className="leaf-pattern leaf-two">❋</div>
-          <div className="leaf-pattern leaf-three">✦</div>
+        <div className="hero-copy">
 
-          <div className="hero-content">
+          <span className="eyebrow">
+            FROM BEBE'S KITCHEN <Heart size={12} fill="currentColor" />
+          </span>
 
-            <span className="eyebrow">
-              FROM BEBE'S KITCHEN <span>♥</span>
-            </span>
-
-            <div className="hero-logo">
-              <img
-                src="/logo.png"
-                alt="Bebe Da Achaar logo"
-              />
-            </div>
-
-            <h1>
-              Ghar ka Swaad,
-              <br />
-              <em>Bebe ke Saath</em>
-            </h1>
-
-            <p className="hero-subtitle">
-              Asli Homemade Achaar
-              <span>•</span>
-              No Preservatives
-              <span>•</span>
-              Made in Small Batches
-            </p>
-
-            <div className="hero-actions">
-
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="primary-button"
-              >
-                <MessageCircle size={19} />
-                Order Now on WhatsApp
-              </a>
-
-              <span className="seasonal">
-                Limited Seasonal Batches
-              </span>
-
-            </div>
-
-            <p className="hero-bottom-line">
-              Ek baar khaoge, ghar yaad aa jayega.
-            </p>
-
+          <div className="hero-brand">
+            <BebeLogo />
           </div>
 
-          <div className="hero-product">
-            <div className="product-glow"></div>
+          <h1>
+            Ghar ka Swaad,
+            <br />
+            <em>Bebe ke Saath</em>
+          </h1>
 
-            <img
-              src="/images/achar-lifestyle.jpg"
-              alt="Homemade Bebe Da Achaar"
-            />
+          <p className="hero-description">
+            Asli Homemade Achaar
+            <span>•</span>
+            No Preservatives
+            <span>•</span>
+            Made in Small Batches
+          </p>
 
-            <div className="floating-badge">
-              <Heart size={15} fill="currentColor" />
-              <span>100% Homemade</span>
-            </div>
-          </div>
-
-          <a href="#trust" className="scroll-hint">
-            <span>Scroll to taste</span>
-            <ChevronDown size={17} />
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noreferrer"
+            className="gold-button"
+          >
+            <MessageCircle size={18} />
+            Order Now on WhatsApp
           </a>
 
-        </section>
+          <span className="seasonal">
+            ✦ Limited Seasonal Batches ✦
+          </span>
 
+          <p className="hero-line">
+            Ek baar khaoge, ghar yaad aa jayega.
+          </p>
 
-        {/* ================= TRUST ================= */}
+        </div>
 
-        <section className="trust" id="trust">
+        <div className="hero-visual">
+          <AcharJar large />
 
-          <div className="trust-item">
-            <div className="trust-icon">
-              <Leaf size={20} />
-            </div>
-            <strong>Fresh Aam</strong>
-            <span>Fresh raw mangoes</span>
+          <div className="homemade-badge">
+            <strong>100%</strong>
+            <span>Homemade</span>
+            <Heart size={13} fill="currentColor" />
           </div>
+        </div>
 
-          <div className="trust-item">
-            <div className="trust-icon">
-              <Sparkles size={20} />
-            </div>
-            <strong>Traditional</strong>
-            <span>Recipes passed down</span>
+      </section>
+
+
+      {/* TRUST */}
+
+      <section className="trust-bar">
+
+        <div>
+          <Leaf />
+          <strong>Fresh Aam</strong>
+          <span>Fresh raw mangoes</span>
+        </div>
+
+        <div>
+          <Sparkles />
+          <strong>Traditional</strong>
+          <span>Recipes passed down</span>
+        </div>
+
+        <div>
+          <ShieldCheck />
+          <strong>No Preservatives</strong>
+          <span>Nothing unnecessary</span>
+        </div>
+
+        <div>
+          <Heart />
+          <strong>Homemade</strong>
+          <span>Small-batch love</span>
+        </div>
+
+      </section>
+
+
+      {/* FEATURED */}
+
+      <section className="featured section" id="achaar">
+
+        <div className="featured-visual">
+          <AcharJar />
+
+          <div className="fresh-batch">
+            FRESH
+            <br />
+            BATCH
           </div>
+        </div>
 
-          <div className="trust-item">
-            <div className="trust-icon">
-              <ShieldCheck size={20} />
-            </div>
-            <strong>No Preservatives</strong>
-            <span>Nothing unnecessary</span>
-          </div>
+        <div className="featured-copy">
 
-          <div className="trust-item">
-            <div className="trust-icon">
-              <Heart size={20} />
-            </div>
-            <strong>Homemade</strong>
-            <span>Small-batch love</span>
-          </div>
-
-        </section>
-
-
-        {/* ================= FEATURED PRODUCT ================= */}
-
-        <section className="featured section" id="featured">
-
-          <div className="section-label">
+          <span className="eyebrow terracotta">
             BEBE'S FAVOURITE
+          </span>
+
+          <h2>
+            Khatte Aam Ka
+            <br />
+            <em>Achaar is Back!</em> 🥭
+          </h2>
+
+          <p className="big-copy">
+            Kachche aam, ghar ke masale aur Bebe ka
+            wohi purana tareeka.
+          </p>
+
+          <p>
+            Khatta, teekha, chatpata — bilkul waise hi
+            jaise ghar mein banta tha. Har batch chhota
+            hai, taaki har jar mein freshness aur woh
+            <strong> asli ghar ka swaad </strong>
+            bana rahe.
+          </p>
+
+          <div className="ingredients">
+            <span>🥭 Fresh Mangoes</span>
+            <span>🌶️ Hand-blended Masalas</span>
+            <span>❤️ Small Batch</span>
           </div>
 
-          <div className="featured-heading">
-            <h2>
-              Khatte Aam Ka
-              <br />
-              <em>Achaar is Back!</em> 🥭
-            </h2>
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noreferrer"
+            className="green-button"
+          >
+            Order Khatta Aam
+            <ArrowRight size={18} />
+          </a>
+
+          <small>Seasonal batch • Limited jars available</small>
+
+        </div>
+
+      </section>
+
+
+      {/* STORY */}
+
+      <section className="story section" id="story">
+
+        <div className="story-copy">
+
+          <span className="eyebrow terracotta">
+            A LITTLE BIT OF HOME
+          </span>
+
+          <h2>
+            Sab kuch hai…
+            <br />
+            <em>bas achar nahi hai.</em>
+          </h2>
+
+          <p>
+            Dal garam hai.
+            <br />
+            Roti fresh hai.
+            <br />
+            Ghar ki khushboo bhi wahi hai.
+          </p>
+
+          <p>
+            Bas ek cheez missing hai —
+            <strong> Bebe ka achar.</strong>
+          </p>
+
+          <p>
+            Kyunki kuch swaad sirf khaane ke nahi hote.
+            Woh bachpan yaad dilate hain. ❤️
+          </p>
+
+          <div className="bebe-quote">
+            <em>“Ek chamach aur?”</em>
+            <span>— Bebe</span>
           </div>
 
-          <div className="featured-image">
+        </div>
 
-            <div className="image-decoration"></div>
+        <ThaliVisual />
 
-            <img
-              src="/images/khatte-aam.jpg"
-              alt="Khatte Aam Ka Achaar"
-            />
+      </section>
 
-            <span className="batch-tag">
-              FRESH BATCH
-            </span>
 
-          </div>
+      {/* WHY */}
 
-          <div className="featured-copy">
+      <section className="why section" id="why">
 
-            <p className="lead-copy">
-              Kachche aam, ghar ke masale aur Bebe ka
-              wohi purana tareeka.
-            </p>
+        <div className="why-intro">
 
+          <span className="eyebrow light">
+            WHY BEBE DA ACHAAR
+          </span>
+
+          <h2>
+            Har jar mein
+            <br />
+            <em>kuch khaas hai.</em>
+          </h2>
+
+          <p>
+            Simple ingredients. Purani recipes.
+            Bebe ka pyaar.
+          </p>
+
+        </div>
+
+        <div className="benefits">
+
+          <article>
+            <div className="benefit-icon">👵🏻</div>
+            <small>01</small>
+            <h3>Traditional Family Recipes</h3>
             <p>
-              Khatta, teekha, chatpata — bilkul waise hi
-              jaise ghar mein banta tha. Har batch chhota
-              hai, taaki har jar mein freshness aur woh
-              <strong> asli ghar ka swaad </strong>
-              bana rahe.
+              Purani ghar ki recipes,
+              generations se sambhali hui.
             </p>
+          </article>
 
-            <div className="ingredient-row">
-
-              <span>
-                <b>🥭</b>
-                Fresh Mangoes
-              </span>
-
-              <span>
-                <b>🌶️</b>
-                Hand-blended
-              </span>
-
-              <span>
-                <b>❤️</b>
-                Small Batch
-              </span>
-
-            </div>
-
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="secondary-button"
-            >
-              Order Khatta Aam
-              <ArrowRight size={18} />
-            </a>
-
-            <small>
-              Seasonal batch • Limited jars available
-            </small>
-
-          </div>
-
-        </section>
-
-
-        {/* ================= STORY ================= */}
-
-        <section className="story section" id="story">
-
-          <div className="story-copy">
-
-            <div className="section-label">
-              A LITTLE BIT OF HOME
-            </div>
-
-            <h2>
-              Sab kuch hai…
-              <br />
-              <em>bas achar nahi hai.</em>
-            </h2>
-
-            <div className="story-text">
-
-              <p>
-                Dal garam hai.
-                <br />
-                Roti fresh hai.
-                <br />
-                Ghar ki khushboo bhi wahi hai.
-              </p>
-
-              <p>
-                Bas ek cheez missing hai —
-                <strong> Bebe ka achar.</strong>
-              </p>
-
-              <p>
-                Kyunki kuch swaad sirf khaane ke nahi
-                hote. Woh bachpan yaad dilate hain.
-                ❤️
-              </p>
-
-            </div>
-
-            <div className="bebe-note">
-              <span>“Ek chamach aur?”</span>
-              <small>— Bebe</small>
-            </div>
-
-          </div>
-
-          <div className="story-image">
-
-            <img
-              src="/images/thali-achaar.jpg"
-              alt="Traditional Indian thali with homemade achaar"
-            />
-
-            <div className="missing-achaar">
-              <span>ACHAR?</span>
-              <small>Missing piece!</small>
-            </div>
-
-          </div>
-
-        </section>
-
-
-        {/* ================= WHY BEBE ================= */}
-
-        <section className="why section" id="why">
-
-          <div className="why-heading">
-
-            <div className="section-label light">
-              WHY BEBE DA ACHAAR
-            </div>
-
-            <h2>
-              Har jar mein
-              <br />
-              <em>kuch khaas hai.</em>
-            </h2>
-
+          <article>
+            <div className="benefit-icon">🌿</div>
+            <small>02</small>
+            <h3>Pure Ingredients Only</h3>
             <p>
-              Simple ingredients. Purani recipes.
-              Bebe ka pyaar.
+              Jo Bebe apni rasoi mein use karein,
+              wahi humare achar mein jaaye.
             </p>
+          </article>
 
-          </div>
-
-
-          <div className="benefit-grid">
-
-            <article className="benefit-card">
-
-              <div className="benefit-icon">
-                <span>👵</span>
-              </div>
-
-              <span className="card-number">01</span>
-
-              <h3>
-                Traditional Family Recipes
-              </h3>
-
-              <p>
-                Purani ghar ki recipes,
-                generations se sambhali hui.
-              </p>
-
-            </article>
-
-
-            <article className="benefit-card">
-
-              <div className="benefit-icon">
-                <span>🌿</span>
-              </div>
-
-              <span className="card-number">02</span>
-
-              <h3>
-                Pure Ingredients Only
-              </h3>
-
-              <p>
-                Jo Bebe apni rasoi mein use karein,
-                wahi humare achar mein jaaye.
-              </p>
-
-            </article>
-
-
-            <article className="benefit-card">
-
-              <div className="benefit-icon">
-                <span>❤️</span>
-              </div>
-
-              <span className="card-number">03</span>
-
-              <h3>
-                Made with Bebe's Love
-              </h3>
-
-              <p>
-                Machine-made nahi.
-                Har batch mein ghar wali feeling.
-              </p>
-
-            </article>
-
-
-            <article className="benefit-card">
-
-              <div className="benefit-icon">
-                <span>🏺</span>
-              </div>
-
-              <span className="card-number">04</span>
-
-              <h3>
-                Hygienic Small Batches
-              </h3>
-
-              <p>
-                Chhote batches mein carefully
-                prepared, packed & ready for your table.
-              </p>
-
-            </article>
-
-          </div>
-
-        </section>
-
-
-        {/* ================= SOCIAL CTA ================= */}
-
-        <section className="social-cta section">
-
-          <div className="social-image">
-
-            <img
-              src="/images/achar-lifestyle.jpg"
-              alt="Fresh homemade mango achaar"
-            />
-
-          </div>
-
-          <div className="social-content">
-
-            <div className="mini-heart">
-              ♥
-            </div>
-
-            <h2>
-              Taste the tradition.
-              <br />
-              <em>Taste the memories.</em>
-            </h2>
-
+          <article>
+            <div className="benefit-icon">❤️</div>
+            <small>03</small>
+            <h3>Made with Bebe's Love</h3>
             <p>
-              Aaj apni plate ko woh missing piece
-              de do. 🥭❤️
+              Machine-made nahi.
+              Har batch mein ghar wali feeling.
             </p>
+          </article>
 
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="primary-button"
-            >
-              <MessageCircle size={19} />
-              Order on WhatsApp
-            </a>
-
-            <span className="phone-number">
-              +91 85951 19741
-            </span>
-
-            <a
-              href="https://instagram.com/bebe_da_achaar"
-              target="_blank"
-              rel="noreferrer"
-              className="instagram-link"
-            >
-              <Instagram size={19} />
-              @bebe_da_achaar
-            </a>
-
-          </div>
-
-        </section>
-
-
-        {/* ================= FINAL CTA ================= */}
-
-        <section className="final-cta" id="contact">
-
-          <div className="final-inner">
-
-            <div className="final-logo">
-              <img
-                src="/logo.png"
-                alt="Bebe Da Achaar"
-              />
-            </div>
-
-            <span className="eyebrow light">
-              ONE LAST THING...
-            </span>
-
-            <h2>
-              Achar toh ghar ka
-              <br />
-              <em>hi hona chahiye.</em>
-            </h2>
-
+          <article>
+            <div className="benefit-icon">🏺</div>
+            <small>04</small>
+            <h3>Hygienic Small Batches</h3>
             <p>
-              Fresh batch ka wait mat karo.
-              <br />
-              Bebe ko WhatsApp karo. ❤️
+              Chhote batches mein carefully
+              prepared, packed & ready for your table.
             </p>
+          </article>
 
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="gold-button"
-            >
-              WhatsApp Bebe
-              <ArrowRight size={18} />
-            </a>
+        </div>
 
-          </div>
-
-        </section>
-
-      </main>
+      </section>
 
 
-      {/* ================= FOOTER ================= */}
+      {/* SOCIAL CTA */}
+
+      <section className="social section">
+
+        <div className="spoon-visual">
+          <div className="spoon">🥄</div>
+          <div className="spoon-pickle">🫙</div>
+          <div className="roti-back">🫓</div>
+        </div>
+
+        <div className="social-copy">
+
+          <Heart
+            className="red-heart"
+            size={22}
+            fill="currentColor"
+          />
+
+          <h2>
+            Taste the tradition.
+            <br />
+            <em>Taste the memories.</em>
+          </h2>
+
+          <p>
+            Aaj apni plate ko woh missing piece
+            de do. 🥭❤️
+          </p>
+
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noreferrer"
+            className="gold-button"
+          >
+            <MessageCircle size={18} />
+            Order on WhatsApp
+          </a>
+
+          <strong className="phone">
+            +91 85951 19741
+          </strong>
+
+          <a
+            href="https://instagram.com/bebe_da_achaar"
+            target="_blank"
+            rel="noreferrer"
+            className="instagram"
+          >
+            <Instagram size={18} />
+            @bebe_da_achaar
+          </a>
+
+        </div>
+
+      </section>
+
+
+      {/* FINAL CTA */}
+
+      <section className="final-cta" id="contact">
+
+        <div className="final-brand">
+          <BebeLogo />
+        </div>
+
+        <span className="eyebrow light">
+          ONE LAST THING...
+        </span>
+
+        <h2>
+          Achar toh ghar ka
+          <br />
+          <em>hi hona chahiye.</em>
+        </h2>
+
+        <p>
+          Fresh batch ka wait mat karo.
+          <br />
+          Bebe ko WhatsApp karo. ❤️
+        </p>
+
+        <a
+          href={WHATSAPP}
+          target="_blank"
+          rel="noreferrer"
+          className="gold-button"
+        >
+          WhatsApp Bebe
+          <ArrowRight size={18} />
+        </a>
+
+      </section>
+
+
+      {/* FOOTER */}
 
       <footer className="footer">
 
-        <div className="footer-logo">
-          <img
-            src="/logo.png"
-            alt="Bebe Da Achaar"
-          />
-        </div>
+        <BebeLogo />
 
-        <p className="footer-tagline">
+        <p className="tagline">
           Wrapped in Tradition.
         </p>
 
-        <div className="footer-details">
+        <div className="footer-links">
 
-          <a href={whatsappUrl}>
-            <MessageCircle size={16} />
+          <a href={WHATSAPP}>
+            <MessageCircle size={15} />
             +91 85951 19741
           </a>
 
@@ -581,13 +521,13 @@ function App() {
             target="_blank"
             rel="noreferrer"
           >
-            <Instagram size={16} />
+            <Instagram size={15} />
             @bebe_da_achaar
           </a>
 
         </div>
 
-        <div className="footer-bottom">
+        <div className="copyright">
           © 2026 Bebe Da Achaar
           <span>•</span>
           Made with love, one batch at a time.
@@ -596,7 +536,7 @@ function App() {
       </footer>
 
 
-      {/* ================= STICKY MOBILE CTA ================= */}
+      {/* MOBILE STICKY CTA */}
 
       <div className="sticky-order">
 
@@ -604,12 +544,12 @@ function App() {
           <span>🥭</span>
           <div>
             <strong>Ready for some ghar ka swaad?</strong>
-            <small>Fresh batches available</small>
+            <small>Fresh seasonal batches</small>
           </div>
         </div>
 
         <a
-          href={whatsappUrl}
+          href={WHATSAPP}
           target="_blank"
           rel="noreferrer"
         >
