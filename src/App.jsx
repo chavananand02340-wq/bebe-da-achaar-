@@ -1,298 +1,438 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowRight,
   Check,
+  ChevronDown,
   Heart,
-  Instagram,
-  Leaf,
-  Menu,
-  MessageCircle,
-  ShieldCheck,
+  Minus,
+  Plus,
+  ShoppingBag,
   Sparkles,
+  Star,
+  Leaf,
+  ShieldCheck,
   X,
 } from "lucide-react";
 
-const WHATSAPP =
-  "https://wa.me/918595119741?text=Hi%20Bebe%20Da%20Achaar!%20%F0%9F%8C%B6%20I%20would%20like%20to%20order%20some%20homemade%20achaar.";
+const products = [
+  {
+    id: "aam",
+    name: "Khatte Aam Ka Achaar",
+    short: "Made with fresh raw mangoes & traditional masalas",
+    basePrices: {
+      "250g": 149,
+      "500g": 269,
+      "1kg": 499,
+    },
+    emoji: "🥭",
+    type: "mango",
+    label: "KHATTA • CHATPATA",
+  },
+  {
+    id: "nimbu",
+    name: "Nimbu Achaar",
+    short: "Zesty lemons blended with Bebe's traditional masalas",
+    basePrices: {
+      "250g": 139,
+      "500g": 249,
+      "1kg": 459,
+    },
+    emoji: "🍋",
+    type: "lemon",
+    label: "KHATTA • ZESTY",
+  },
+  {
+    id: "mirch",
+    name: "Mirch Achaar",
+    short: "Fresh green chillies with aromatic homemade spices",
+    basePrices: {
+      "250g": 159,
+      "500g": 289,
+      "1kg": 529,
+    },
+    emoji: "🌶️",
+    type: "chilli",
+    label: "TEEKHA • DESI",
+  },
+];
 
-function BebeLogo({ small = false }) {
+function Logo({ compact = false }) {
   return (
-    <div className={`brand-logo ${small ? "small" : ""}`}>
-      <div className="bebe-avatar">👵🏻</div>
-      <div className="brand-name">
+    <div className={`brand-logo ${compact ? "compact" : ""}`}>
+      <div className="logo-avatar">👵🏻</div>
+      <div className="logo-copy">
         <strong>Bebe Da</strong>
-        <strong>Achaar</strong>
+        <span>Achaar</span>
       </div>
     </div>
   );
 }
 
-function AcharJar({ large = false }) {
+function ProductVisual({ product }) {
   return (
-    <div className={`jar-scene ${large ? "large" : ""}`}>
-      <div className="leaf leaf-a">🌿</div>
-      <div className="leaf leaf-b">🌿</div>
+    <div className={`product-visual ${product.type}`}>
+      <div className="visual-glow" />
 
-      <div className="mango mango-one">🥭</div>
-      <div className="mango mango-two">🥭</div>
+      <div className="spice spice-one">✦</div>
+      <div className="spice spice-two">✦</div>
+      <div className="spice spice-three">•</div>
 
-      <div className="jar-shadow" />
-
-      <div className="achar-jar">
+      <div className="jar">
         <div className="jar-lid">
-          <span />
+          <span>BEBE</span>
         </div>
 
-        <div className="jar-glass">
-          <div className="pickle-layer one" />
-          <div className="pickle-layer two" />
-          <div className="pickle-layer three" />
+        <div className="jar-body">
+          <div className="jar-food">{product.emoji}</div>
 
           <div className="jar-label">
-            <div className="label-bebe">👵🏻</div>
-            <strong>Bebe Da</strong>
-            <strong>Achaar</strong>
-            <small>Homemade • Since forever</small>
+            <small>BEBE DA</small>
+            <strong>ACHAAR</strong>
+            <span>{product.type === "mango" ? "AAM" : product.type === "lemon" ? "NIMBU" : "MIRCH"}</span>
           </div>
         </div>
       </div>
 
-      <div className="spice-bowl">🌶️</div>
-      <div className="mustard-seeds">•••</div>
+      <div className="raw-ingredient">
+        {product.type === "mango" && "🥭"}
+        {product.type === "lemon" && "🍋"}
+        {product.type === "chilli" && "🌶️"}
+      </div>
     </div>
   );
 }
 
-function ThaliVisual() {
-  return (
-    <div className="thali-visual">
-      <div className="wood-background" />
-
-      <div className="thali">
-        <div className="roti">🫓</div>
-        <div className="dal">🥣</div>
-        <div className="sabzi">🥗</div>
-        <div className="rice">🍚</div>
-
-        <div className="missing-achaar">
-          <span>ACHAR?</span>
-          <small>Missing piece!</small>
-        </div>
-      </div>
-    </div>
-  );
+function TrustIcon({ type }) {
+  if (type === "fresh") return <Leaf size={18} />;
+  if (type === "recipe") return <Sparkles size={18} />;
+  if (type === "pure") return <ShieldCheck size={18} />;
+  return <Heart size={18} />;
 }
 
 function App() {
-  const [menu, setMenu] = useState(false);
+  const [cart, setCart] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState(
+    Object.fromEntries(products.map((product) => [product.id, "250g"]))
+  );
+  const [quantities, setQuantities] = useState(
+    Object.fromEntries(products.map((product) => [product.id, 1]))
+  );
+  const [cartOpen, setCartOpen] = useState(false);
 
-  const close = () => setMenu(false);
+  const updateSize = (productId, size) => {
+    setSelectedSizes((current) => ({
+      ...current,
+      [productId]: size,
+    }));
+  };
+
+  const updateQuantity = (productId, amount) => {
+    setQuantities((current) => ({
+      ...current,
+      [productId]: Math.max(1, current[productId] + amount),
+    }));
+  };
+
+  const addToCart = (product) => {
+    const size = selectedSizes[product.id];
+    const quantity = quantities[product.id];
+    const price = product.basePrices[size];
+
+    setCart((current) => {
+      const existingIndex = current.findIndex(
+        (item) => item.id === product.id && item.size === size
+      );
+
+      if (existingIndex !== -1) {
+        return current.map((item, index) =>
+          index === existingIndex
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+
+      return [
+        ...current,
+        {
+          id: product.id,
+          name: product.name,
+          size,
+          price,
+          quantity,
+          emoji: product.emoji,
+        },
+      ];
+    });
+  };
+
+  const changeCartQuantity = (index, amount) => {
+    setCart((current) =>
+      current
+        .map((item, itemIndex) =>
+          itemIndex === index
+            ? { ...item, quantity: item.quantity + amount }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
+
+  const cartCount = useMemo(
+    () => cart.reduce((total, item) => total + item.quantity, 0),
+    [cart]
+  );
+
+  const cartTotal = useMemo(
+    () =>
+      cart.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+    [cart]
+  );
+
+  const scrollToShop = () => {
+    document.getElementById("shop")?.scrollIntoView({
+      behavior: "smooth",
+    });
+  };
 
   return (
-    <div className="app">
-
-      {/* NAVBAR */}
-
-      <header className="navbar">
-        <a href="#home" onClick={close}>
-          <BebeLogo small />
+    <div className="site-shell">
+      {/* HEADER */}
+      <header className="mobile-header">
+        <a href="#home" aria-label="Bebe Da Achaar home">
+          <Logo compact />
         </a>
 
-        <nav className={menu ? "nav-menu open" : "nav-menu"}>
-          <a href="#home" onClick={close}>Home</a>
-          <a href="#achaar" onClick={close}>Our Achaar</a>
-          <a href="#story" onClick={close}>Bebe Ki Kahani</a>
-          <a href="#why" onClick={close}>Why Bebe</a>
-          <a href="#contact" onClick={close}>Contact</a>
-
-          <a
-            className="nav-order"
-            href={WHATSAPP}
-            target="_blank"
-            rel="noreferrer"
-            onClick={close}
-          >
-            <MessageCircle size={16} />
-            Order on WhatsApp
-          </a>
-        </nav>
-
         <button
-          className="menu-toggle"
-          onClick={() => setMenu(!menu)}
-          aria-label="Menu"
+          className="header-cart"
+          onClick={() => setCartOpen(true)}
+          aria-label="Open cart"
         >
-          {menu ? <X size={21} /> : <Menu size={21} />}
+          <ShoppingBag size={21} />
+          {cartCount > 0 && <span>{cartCount}</span>}
         </button>
       </header>
 
-
       {/* HERO */}
+      <main>
+        <section className="hero" id="home">
+          <div className="hero-image">
+            <div className="hero-overlay" />
 
-      <section className="hero" id="home">
+            <div className="hero-scene">
+              <div className="hero-jar hero-jar-back">
+                <span>🥭</span>
+              </div>
 
-        <div className="hero-pattern pattern-one">🌿</div>
-        <div className="hero-pattern pattern-two">✦</div>
+              <div className="hero-jar hero-jar-main">
+                <div className="hero-lid">BEBE</div>
+                <div className="hero-label">
+                  <small>BEBE DA</small>
+                  <strong>ACHAAR</strong>
+                  <span>KHATTE AAM</span>
+                </div>
+              </div>
 
-        <div className="hero-copy">
-
-          <span className="eyebrow">
-            FROM BEBE'S KITCHEN <Heart size={12} fill="currentColor" />
-          </span>
-
-          <div className="hero-brand">
-            <BebeLogo />
+              <div className="hero-mango">🥭</div>
+              <div className="hero-chilli">🌶️</div>
+              <div className="hero-spice-bowl">✦</div>
+              <div className="hero-spice-bowl second">✦</div>
+            </div>
           </div>
 
-          <h1>
-            Ghar ka Swaad,
-            <br />
-            <em>Bebe ke Saath</em>
-          </h1>
+          <div className="hero-content">
+            <span className="eyebrow">FROM BEBE'S KITCHEN</span>
 
-          <p className="hero-description">
-            Asli Homemade Achaar
-            <span>•</span>
-            No Preservatives
-            <span>•</span>
-            Made in Small Batches
-          </p>
+            <h1>
+              Ghar ka Swaad,
+              <br />
+              <em>Bebe ke Saath</em>
+            </h1>
 
-          <a
-            href={WHATSAPP}
-            target="_blank"
-            rel="noreferrer"
-            className="gold-button"
-          >
-            <MessageCircle size={18} />
-            Order Now on WhatsApp
-          </a>
+            <p>
+              Asli Homemade Achaar • No Preservatives • Made in Small Batches
+            </p>
 
-          <span className="seasonal">
-            ✦ Limited Seasonal Batches ✦
-          </span>
+            <button className="primary-button hero-button" onClick={scrollToShop}>
+              Shop Now
+              <ArrowRight size={19} />
+            </button>
 
-          <p className="hero-line">
-            Ek baar khaoge, ghar yaad aa jayega.
-          </p>
-
-        </div>
-
-        <div className="hero-visual">
-          <AcharJar large />
-
-          <div className="homemade-badge">
-            <strong>100%</strong>
-            <span>Homemade</span>
-            <Heart size={13} fill="currentColor" />
+            <div className="season-note">
+              <span>✦</span>
+              Limited Seasonal Batches
+              <span>✦</span>
+            </div>
           </div>
-        </div>
+        </section>
 
-      </section>
+        {/* TRUST */}
+        <section className="trust-strip">
+          {[
+            ["fresh", "Fresh Ingredients"],
+            ["recipe", "Traditional Recipe"],
+            ["pure", "No Preservatives"],
+            ["batch", "Small Batch Made"],
+          ].map(([type, text]) => (
+            <div className="trust-item" key={text}>
+              <div className="trust-icon">
+                <TrustIcon type={type} />
+              </div>
+              <span>{text}</span>
+            </div>
+          ))}
+        </section>
 
-
-      {/* TRUST */}
-
-      <section className="trust-bar">
-
-        <div>
-          <Leaf />
-          <strong>Fresh Aam</strong>
-          <span>Fresh raw mangoes</span>
-        </div>
-
-        <div>
-          <Sparkles />
-          <strong>Traditional</strong>
-          <span>Recipes passed down</span>
-        </div>
-
-        <div>
-          <ShieldCheck />
-          <strong>No Preservatives</strong>
-          <span>Nothing unnecessary</span>
-        </div>
-
-        <div>
-          <Heart />
-          <strong>Homemade</strong>
-          <span>Small-batch love</span>
-        </div>
-
-      </section>
-
-
-      {/* FEATURED */}
-
-      <section className="featured section" id="achaar">
-
-        <div className="featured-visual">
-          <AcharJar />
-
-          <div className="fresh-batch">
-            FRESH
-            <br />
-            BATCH
-          </div>
-        </div>
-
-        <div className="featured-copy">
-
-          <span className="eyebrow terracotta">
-            BEBE'S FAVOURITE
-          </span>
-
-          <h2>
-            Khatte Aam Ka
-            <br />
-            <em>Achaar is Back!</em> 🥭
-          </h2>
-
-          <p className="big-copy">
-            Kachche aam, ghar ke masale aur Bebe ka
-            wohi purana tareeka.
-          </p>
-
-          <p>
-            Khatta, teekha, chatpata — bilkul waise hi
-            jaise ghar mein banta tha. Har batch chhota
-            hai, taaki har jar mein freshness aur woh
-            <strong> asli ghar ka swaad </strong>
-            bana rahe.
-          </p>
-
-          <div className="ingredients">
-            <span>🥭 Fresh Mangoes</span>
-            <span>🌶️ Hand-blended Masalas</span>
-            <span>❤️ Small Batch</span>
+        {/* SHOP */}
+        <section className="shop-section section" id="shop">
+          <div className="section-heading">
+            <span className="eyebrow">STRAIGHT FROM BEBE'S KITCHEN</span>
+            <h2>Our Homemade <em>Achaar</em></h2>
+            <p>
+              Har jar mein fresh ingredients, purani recipe aur wohi ghar wala
+              swaad.
+            </p>
           </div>
 
-          <a
-            href={WHATSAPP}
-            target="_blank"
-            rel="noreferrer"
-            className="green-button"
-          >
-            Order Khatta Aam
-            <ArrowRight size={18} />
-          </a>
+          <div className="product-list">
+            {products.map((product, productIndex) => {
+              const size = selectedSizes[product.id];
+              const quantity = quantities[product.id];
+              const price = product.basePrices[size];
 
-          <small>Seasonal batch • Limited jars available</small>
+              return (
+                <article className="product-card" key={product.id}>
+                  <div className="product-number">
+                    0{productIndex + 1}
+                  </div>
 
-        </div>
+                  <ProductVisual product={product} />
 
-      </section>
+                  <div className="product-content">
+                    <div className="product-tag">{product.label}</div>
 
+                    <h3>{product.name}</h3>
 
-      {/* STORY */}
+                    <p>{product.short}</p>
 
-      <section className="story section" id="story">
+                    <div className="rating-row">
+                      <div className="stars">
+                        <Star size={13} fill="currentColor" />
+                        <Star size={13} fill="currentColor" />
+                        <Star size={13} fill="currentColor" />
+                        <Star size={13} fill="currentColor" />
+                        <Star size={13} fill="currentColor" />
+                      </div>
+                      <span>Homemade favourite</span>
+                    </div>
 
-        <div className="story-copy">
+                    <div className="size-block">
+                      <div className="option-title">
+                        <span>Choose size</span>
+                        <strong>{size}</strong>
+                      </div>
 
-          <span className="eyebrow terracotta">
-            A LITTLE BIT OF HOME
-          </span>
+                      <div className="size-selector">
+                        {["250g", "500g", "1kg"].map((option) => (
+                          <button
+                            key={option}
+                            className={size === option ? "active" : ""}
+                            onClick={() => updateSize(product.id, option)}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="product-bottom">
+                      <div className="price">
+                        <small>₹</small>
+                        {price}
+                      </div>
+
+                      <div className="quantity-selector">
+                        <button
+                          onClick={() => updateQuantity(product.id, -1)}
+                          aria-label={`Decrease ${product.name} quantity`}
+                        >
+                          <Minus size={15} />
+                        </button>
+
+                        <span>{quantity}</span>
+
+                        <button
+                          onClick={() => updateQuantity(product.id, 1)}
+                          aria-label={`Increase ${product.name} quantity`}
+                        >
+                          <Plus size={15} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      className="add-button"
+                      onClick={() => addToCart(product)}
+                    >
+                      Add to Cart
+                      <ShoppingBag size={18} />
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* WHY BEBE */}
+        <section className="why-section section" id="about">
+          <div className="section-heading">
+            <span className="eyebrow">WHY BEBE DA ACHAAR</span>
+            <h2>Har jar mein <em>kuch khaas</em> hai.</h2>
+            <p>
+              Simple ingredients. Purani recipes. Bebe ka pyaar.
+            </p>
+          </div>
+
+          <div className="benefits">
+            <article className="benefit-card">
+              <div className="benefit-icon">🌿</div>
+              <span>01</span>
+              <h3>Traditional Family Recipes</h3>
+              <p>
+                Woh recipes jo saalon se ghar mein banti aa rahi hain.
+              </p>
+            </article>
+
+            <article className="benefit-card">
+              <div className="benefit-icon">✨</div>
+              <span>02</span>
+              <h3>Pure & Hygienic</h3>
+              <p>
+                Carefully selected ingredients, clean preparation and no
+                unnecessary preservatives.
+              </p>
+            </article>
+
+            <article className="benefit-card">
+              <div className="benefit-icon">❤️</div>
+              <span>03</span>
+              <h3>Made with Bebe's Love</h3>
+              <p>
+                Har batch mein woh warmth jo sirf ghar ke khaane mein milti
+                hai.
+              </p>
+            </article>
+          </div>
+        </section>
+
+        {/* EMOTIONAL BANNER */}
+        <section className="emotional-banner">
+          <div className="emotional-pattern">🥭 &nbsp; ✦ &nbsp; 🌶️</div>
+
+          <span className="eyebrow">THE MISSING PIECE</span>
 
           <h2>
             Sab kuch hai…
@@ -301,263 +441,152 @@ function App() {
           </h2>
 
           <p>
-            Dal garam hai.
+            Dal garam hai. Roti fresh hai. Ghar ki khushboo bhi wahi hai.
             <br />
-            Roti fresh hai.
-            <br />
-            Ghar ki khushboo bhi wahi hai.
+            Bas ek spoon Bebe ka achar aur chahiye.
           </p>
 
-          <p>
-            Bas ek cheez missing hai —
-            <strong> Bebe ka achar.</strong>
-          </p>
+          <button className="outline-button" onClick={scrollToShop}>
+            Find Your Achaar
+            <ArrowRight size={18} />
+          </button>
+        </section>
 
-          <p>
-            Kyunki kuch swaad sirf khaane ke nahi hote.
-            Woh bachpan yaad dilate hain. ❤️
-          </p>
-
-          <div className="bebe-quote">
-            <em>“Ek chamach aur?”</em>
-            <span>— Bebe</span>
+        {/* FOOTER */}
+        <footer className="footer" id="contact">
+          <div className="footer-brand">
+            <Logo />
+            <p>Wrapped in Tradition.</p>
           </div>
 
-        </div>
-
-        <ThaliVisual />
-
-      </section>
-
-
-      {/* WHY */}
-
-      <section className="why section" id="why">
-
-        <div className="why-intro">
-
-          <span className="eyebrow light">
-            WHY BEBE DA ACHAAR
-          </span>
-
-          <h2>
-            Har jar mein
-            <br />
-            <em>kuch khaas hai.</em>
-          </h2>
-
-          <p>
-            Simple ingredients. Purani recipes.
-            Bebe ka pyaar.
-          </p>
-
-        </div>
-
-        <div className="benefits">
-
-          <article>
-            <div className="benefit-icon">👵🏻</div>
-            <small>01</small>
-            <h3>Traditional Family Recipes</h3>
-            <p>
-              Purani ghar ki recipes,
-              generations se sambhali hui.
-            </p>
-          </article>
-
-          <article>
-            <div className="benefit-icon">🌿</div>
-            <small>02</small>
-            <h3>Pure Ingredients Only</h3>
-            <p>
-              Jo Bebe apni rasoi mein use karein,
-              wahi humare achar mein jaaye.
-            </p>
-          </article>
-
-          <article>
-            <div className="benefit-icon">❤️</div>
-            <small>03</small>
-            <h3>Made with Bebe's Love</h3>
-            <p>
-              Machine-made nahi.
-              Har batch mein ghar wali feeling.
-            </p>
-          </article>
-
-          <article>
-            <div className="benefit-icon">🏺</div>
-            <small>04</small>
-            <h3>Hygienic Small Batches</h3>
-            <p>
-              Chhote batches mein carefully
-              prepared, packed & ready for your table.
-            </p>
-          </article>
-
-        </div>
-
-      </section>
-
-
-      {/* SOCIAL CTA */}
-
-      <section className="social section">
-
-        <div className="spoon-visual">
-          <div className="spoon">🥄</div>
-          <div className="spoon-pickle">🫙</div>
-          <div className="roti-back">🫓</div>
-        </div>
-
-        <div className="social-copy">
-
-          <Heart
-            className="red-heart"
-            size={22}
-            fill="currentColor"
-          />
-
-          <h2>
-            Taste the tradition.
-            <br />
-            <em>Taste the memories.</em>
-          </h2>
-
-          <p>
-            Aaj apni plate ko woh missing piece
-            de do. 🥭❤️
-          </p>
-
-          <a
-            href={WHATSAPP}
-            target="_blank"
-            rel="noreferrer"
-            className="gold-button"
-          >
-            <MessageCircle size={18} />
-            Order on WhatsApp
-          </a>
-
-          <strong className="phone">
-            +91 85951 19741
-          </strong>
-
-          <a
-            href="https://instagram.com/bebe_da_achaar"
-            target="_blank"
-            rel="noreferrer"
-            className="instagram"
-          >
-            <Instagram size={18} />
-            @bebe_da_achaar
-          </a>
-
-        </div>
-
-      </section>
-
-
-      {/* FINAL CTA */}
-
-      <section className="final-cta" id="contact">
-
-        <div className="final-brand">
-          <BebeLogo />
-        </div>
-
-        <span className="eyebrow light">
-          ONE LAST THING...
-        </span>
-
-        <h2>
-          Achar toh ghar ka
-          <br />
-          <em>hi hona chahiye.</em>
-        </h2>
-
-        <p>
-          Fresh batch ka wait mat karo.
-          <br />
-          Bebe ko WhatsApp karo. ❤️
-        </p>
-
-        <a
-          href={WHATSAPP}
-          target="_blank"
-          rel="noreferrer"
-          className="gold-button"
-        >
-          WhatsApp Bebe
-          <ArrowRight size={18} />
-        </a>
-
-      </section>
-
-
-      {/* FOOTER */}
-
-      <footer className="footer">
-
-        <BebeLogo />
-
-        <p className="tagline">
-          Wrapped in Tradition.
-        </p>
-
-        <div className="footer-links">
-
-          <a href={WHATSAPP}>
-            <MessageCircle size={15} />
-            +91 85951 19741
-          </a>
-
-          <a href="https://bebedaachaar.in">
-            bebedaachaar.in
-          </a>
-
-          <a
-            href="https://instagram.com/bebe_da_achaar"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Instagram size={15} />
-            @bebe_da_achaar
-          </a>
-
-        </div>
-
-        <div className="copyright">
-          © 2026 Bebe Da Achaar
-          <span>•</span>
-          Made with love, one batch at a time.
-        </div>
-
-      </footer>
-
-
-      {/* MOBILE STICKY CTA */}
-
-      <div className="sticky-order">
-
-        <div>
-          <span>🥭</span>
-          <div>
-            <strong>Ready for some ghar ka swaad?</strong>
-            <small>Fresh seasonal batches</small>
+          <div className="footer-links">
+            <a href="#shop">Shop</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
           </div>
+
+          <div className="footer-bottom">
+            <span>© 2026 Bebe Da Achaar</span>
+            <span>Made with ❤️ &amp; tradition</span>
+          </div>
+        </footer>
+      </main>
+
+      {/* STICKY CART BAR */}
+      {cartCount > 0 && (
+        <div className="sticky-cart">
+          <div className="sticky-cart-info">
+            <div className="sticky-cart-icon">
+              <ShoppingBag size={19} />
+              <span>{cartCount}</span>
+            </div>
+
+            <div>
+              <small>{cartCount === 1 ? "1 item" : `${cartCount} items`}</small>
+              <strong>₹{cartTotal}</strong>
+            </div>
+          </div>
+
+          <button onClick={() => setCartOpen(true)}>
+            Go to Cart
+            <ArrowRight size={17} />
+          </button>
         </div>
+      )}
 
-        <a
-          href={WHATSAPP}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Order
-        </a>
+      {/* CART DRAWER */}
+      {cartOpen && (
+        <div className="cart-overlay" onClick={() => setCartOpen(false)}>
+          <aside
+            className="cart-drawer"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="cart-header">
+              <div>
+                <span className="eyebrow">YOUR ORDER</span>
+                <h2>Your Cart</h2>
+              </div>
 
-      </div>
+              <button
+                className="close-cart"
+                onClick={() => setCartOpen(false)}
+                aria-label="Close cart"
+              >
+                <X size={21} />
+              </button>
+            </div>
 
+            {cart.length === 0 ? (
+              <div className="empty-cart">
+                <div className="empty-cart-icon">🥭</div>
+                <h3>Your cart is waiting.</h3>
+                <p>Pick your favourite achaar and bring ghar ka swaad home.</p>
+                <button
+                  className="primary-button"
+                  onClick={() => {
+                    setCartOpen(false);
+                    scrollToShop();
+                  }}
+                >
+                  Shop Achaar
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="cart-items">
+                  {cart.map((item, index) => (
+                    <div className="cart-item" key={`${item.id}-${item.size}`}>
+                      <div className="cart-item-visual">
+                        {item.emoji}
+                      </div>
+
+                      <div className="cart-item-details">
+                        <h3>{item.name}</h3>
+                        <span>{item.size}</span>
+
+                        <div className="cart-item-bottom">
+                          <strong>₹{item.price * item.quantity}</strong>
+
+                          <div className="mini-quantity">
+                            <button onClick={() => changeCartQuantity(index, -1)}>
+                              <Minus size={12} />
+                            </button>
+                            <span>{item.quantity}</span>
+                            <button onClick={() => changeCartQuantity(index, 1)}>
+                              <Plus size={12} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="cart-summary">
+                  <div>
+                    <span>Subtotal</span>
+                    <strong>₹{cartTotal}</strong>
+                  </div>
+
+                  <div>
+                    <span>Delivery</span>
+                    <span className="delivery-note">Calculated at checkout</span>
+                  </div>
+
+                  <button className="checkout-button">
+                    Proceed to Checkout
+                    <ArrowRight size={18} />
+                  </button>
+
+                  <small className="checkout-note">
+                    Secure checkout • Freshly packed with care
+                  </small>
+                </div>
+              </>
+            )}
+          </aside>
+        </div>
+      )}
     </div>
   );
 }
